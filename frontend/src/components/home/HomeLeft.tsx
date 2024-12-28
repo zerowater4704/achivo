@@ -33,7 +33,16 @@ const HomeLeft: React.FC = () => {
   };
 
   const handleLogin = () => {
-    window.location.href = import.meta.env.VITE_API_URL;
+    const googleAuthUrl = import.meta.env.VITE_GOOGLE_AUTH_URL;
+    const params = new URLSearchParams({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      redirect_uri: import.meta.env.VITE_GOOGLE_CALLBACK,
+      response_type: "code",
+      scope: "email profile",
+      access_type: "offline",
+    });
+
+    window.location.href = `${googleAuthUrl}?${params.toString()}`;
   };
 
   return (

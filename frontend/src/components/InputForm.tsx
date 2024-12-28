@@ -16,7 +16,7 @@ const InputForm = React.forwardRef<HTMLInputElement, InputFormProps>(
           type={type}
           ref={ref}
           {...rest}
-          className="bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2"
+          className=" border mb-1 border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2"
         />
       </div>
     );

@@ -9,16 +9,15 @@ import planRouter from "./routes/plan";
 import taskRouter from "./routes/task";
 import authRouter from "./routes/authRoutes";
 import passport from "passport";
-import setupPassport from "./config/passport";
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 dotenv.config();
 connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -26,9 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 
-setupPassport(passport);
-
-// app.use("/auth/", authRouter);
+app.use("/auth", authRouter);
 
 app.use("/api/user", userRouter);
 app.use("/api/goal", goalRouter);

@@ -6,12 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteGoal = exports.updateGoal = exports.getGoal = exports.getsGoal = exports.createGoal = void 0;
 const Goal_1 = __importDefault(require("../models/Goal"));
 const Plan_1 = __importDefault(require("../models/Plan"));
-const Task_1 = __importDefault(require("../models/Task"));
 const createGoal = async (req, res) => {
     var _a;
     try {
         const user = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-        const { title, description, status, startDate, finishDate, plan_id, task_id, } = req.body;
+        const { title, description, isCompleted, progress, startDate, finishDate, plan_id, } = req.body;
         if (!user) {
             res.status(400).json({ message: "ユーザーを見つかりません。" });
             return;
@@ -23,18 +22,18 @@ const createGoal = async (req, res) => {
         if (new Date(finishDate) <= new Date(startDate)) {
             res
                 .status(400)
-                .json({ message: "finishDateをstartDateより後に設定してください。" });
+                .json({ message: "終了日を開始日より後に設定してください。" });
             return;
         }
         const newGoal = new Goal_1.default({
             title,
             description,
-            status,
+            isCompleted,
+            progress,
             startDate: new Date(startDate),
             finishDate: new Date(finishDate),
             createdBy: user,
             plan_id,
-            task_id,
         });
         await newGoal.save();
         res.status(200).json({ newGoal });
@@ -87,7 +86,7 @@ const updateGoal = async (req, res) => {
     try {
         const user = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
         const goalId = req.params.id;
-        const { title, description, status, startDate, finishDate, plan_id, task_id, } = req.body;
+        const { title, description, isCompleted, progress, startDate, finishDate, plan_id, } = req.body;
         const goal = await Goal_1.default.findById(goalId);
         if (!goal) {
             res.status(400).json({ message: "goalを見つかりません。" });
@@ -102,17 +101,17 @@ const updateGoal = async (req, res) => {
             new Date(finishDate) <= new Date(startDate)) {
             res
                 .status(400)
-                .json({ message: "finishDateをstartDateより後に設定してください。" });
+                .json({ message: "終了日を開始日より後に設定してください。" });
             return;
         }
         const updatedGoal = await Goal_1.default.findByIdAndUpdate(goalId, {
             title,
             description,
-            status,
+            isCompleted,
+            progress,
             startDate: new Date(startDate),
             finishDate: new Date(finishDate),
             plan_id,
-            task_id,
         }, { new: true, runValidators: true });
         if (!updatedGoal) {
             res.status(404).json({ message: "ゴールの更新に失敗しました。" });
@@ -139,7 +138,6 @@ const deleteGoal = async (req, res) => {
             return;
         }
         await Plan_1.default.deleteMany({ goal_id: goalId });
-        await Task_1.default.deleteMany({ goal_id: goalId });
         await goal.deleteOne();
         res.status(200).json({ message: "goalを削除しました。" });
     }

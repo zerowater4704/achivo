@@ -8,7 +8,8 @@ export const createPlan = async (req: Request, res: Response) => {
     const {
       title,
       description,
-      status,
+      isCompleted,
+      progress,
       startDate,
       finishDate,
       goal_id,
@@ -36,14 +37,15 @@ export const createPlan = async (req: Request, res: Response) => {
     if (new Date(finishDate) <= new Date(startDate)) {
       res
         .status(400)
-        .json({ message: "finishDateをstartDateより後に設定してください。" });
+        .json({ message: "終了日を開始日より後に設定してください。" });
       return;
     }
 
     const newPlan = new Plan({
       title,
       description,
-      status,
+      isCompleted,
+      progress,
       startDate: new Date(startDate),
       finishDate: new Date(finishDate),
       createdBy: user,
@@ -56,7 +58,21 @@ export const createPlan = async (req: Request, res: Response) => {
     findGoal.plan_id.push(newPlan.id);
     await findGoal.save();
 
-    res.status(200).json({ newPlan });
+    const relatedGoals = await Plan.find({ goal_id: findGoal });
+    const completedPlans = relatedGoals.filter(
+      (goal) => goal.isCompleted
+    ).length;
+    const totalGoal = relatedGoals.length;
+    const goalProgress =
+      totalGoal > 0 ? Math.ceil((completedPlans / totalGoal) * 100) : 0;
+
+    const findUpdateGoal = await Goal.findByIdAndUpdate(
+      findGoal,
+      { progress: goalProgress },
+      { new: true }
+    );
+
+    res.status(200).json({ newPlan: newPlan, goal: findUpdateGoal });
   } catch (error) {
     res.status(500).json({ message: "createPlan Apiエラーです" });
     return;
@@ -126,7 +142,8 @@ export const updatePlan = async (req: Request, res: Response) => {
     const {
       title,
       description,
-      status,
+      isCompleted,
+      progress,
       startDate,
       finishDate,
       task_id,
@@ -160,7 +177,7 @@ export const updatePlan = async (req: Request, res: Response) => {
     if (new Date(finishDate) <= new Date(startDate)) {
       res
         .status(400)
-        .json({ message: "finishDateをstartDateより後に設定してください。" });
+        .json({ message: "終了日を開始日より後に設定してください。" });
       return;
     }
 
@@ -169,7 +186,8 @@ export const updatePlan = async (req: Request, res: Response) => {
       {
         title,
         description,
-        status,
+        isCompleted,
+        progress,
         startDate: new Date(startDate),
         finishDate: new Date(finishDate),
         task_id,
@@ -215,8 +233,6 @@ export const deletePlan = async (req: Request, res: Response) => {
       return;
     }
 
-    const tasks = await Task.find({ plan_id: planId });
-    const taskIds = tasks.map((task) => task._id);
     await Task.deleteMany({ plan_id: planId });
 
     const deletedPlan = await Plan.findByIdAndDelete(planId);
@@ -228,9 +244,22 @@ export const deletePlan = async (req: Request, res: Response) => {
     await Goal.findByIdAndUpdate(deletedPlan.goal_id, {
       $pull: {
         plan_id: planId,
-        task_id: { $in: taskIds },
       },
     });
+
+    const relatedGoals = await Plan.find({ goal_id: plan.goal_id });
+    const completedPlans = relatedGoals.filter(
+      (goal) => goal.isCompleted
+    ).length;
+    const totalGoal = relatedGoals.length;
+    const goalProgress =
+      totalGoal > 0 ? Math.ceil((completedPlans / totalGoal) * 100) : 0;
+
+    const findUpdateGoal = await Goal.findByIdAndUpdate(
+      plan.goal_id,
+      { progress: goalProgress },
+      { new: true }
+    );
 
     res.status(200).json({ message: "planを削除しました。" });
   } catch (error) {

@@ -4,6 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { loginUser } from "../store/features/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import InputForm from "../components/InputForm";
+import { CiLogin } from "react-icons/ci";
 
 interface LoginFormInputs {
   email: string;
@@ -11,8 +12,6 @@ interface LoginFormInputs {
 }
 
 const Login: React.FC = () => {
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { userInfo, loading, error } = useAppSelector((state) => state.user);
@@ -48,20 +47,25 @@ const Login: React.FC = () => {
       <InputForm
         label="Email"
         type="email"
-        {...register("email", { required: "" })}
+        {...register("email", { required: "必須項目です。" })}
       />
+      {errors.email && <p>{errors.email.message}</p>}
       <InputForm
         label="Password"
         type="password"
-        {...register("password", { required: "" })}
+        {...register("password", { required: "必須項目です。" })}
       />
-      {error && <p>{error}</p>}
+      {errors.password && <p>{errors.password.message}</p>}
+      {errors && <p>{error}</p>}
       <button
         type="submit"
         disabled={loading}
-        className=" py-2 px-3 mt-3 bg-yellow-500 rounded-lg w-full"
+        className="text-white py-2 px-3 mt-3 bg-amber-600 rounded-lg w-full font-bold flex justify-center items-center"
       >
         {loading ? "Login..." : "Login"}
+        <span className=" pl-2 text-lg">
+          <CiLogin />
+        </span>
       </button>
     </form>
   );

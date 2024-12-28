@@ -10,6 +10,7 @@ const initialState: TaskState = {
   tasks: [],
   selectedPlan: null,
   selectedTask: null,
+  isCompleted: false,
   loading: false,
   error: null,
   planId: null,
@@ -39,7 +40,7 @@ export const createTask = createAsyncThunk<
       plan_id: planId._id,
     });
 
-    return response.data.newTask;
+    return response.data.task;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return rejectWithValue(error.response?.data as ErrorResponse);
@@ -97,7 +98,7 @@ export const updateTask = createAsyncThunk<
         `/api/task/tasks/${planId}/${taskId}`,
         taskData
       );
-      return response.data;
+      return response.data.task;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data as ErrorResponse);
@@ -177,6 +178,7 @@ const taskSlice = createSlice({
       })
       .addCase(updateTask.fulfilled, (state, action: PayloadAction<ITask>) => {
         state.loading = false;
+        console.log("Updated Task:", action.payload);
         state.tasks = state.tasks.map((task) =>
           task._id === action.payload._id ? action.payload : task
         );

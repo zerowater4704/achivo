@@ -1,13 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import axiosInstance from "../../../hooks/useAxios";
 
 const API_URL = "http://localhost:3000/";
 
+interface UserInfo {
+  email: string;
+  name: string;
+}
+
 interface UserState {
-  userInfo: {
-    email: string;
-    name: string;
-  } | null;
+  userInfo: UserInfo | null;
   loading: boolean;
   error: string | null;
   accessToken: string | null;
@@ -25,12 +28,14 @@ const initialState: UserState = {
 };
 
 export const signupUser = createAsyncThunk<
-  UserState["userInfo"],
+  { accessToken: string; user: UserInfo },
   { email: string; password: string; name: string },
   { rejectValue: ErrorResponse }
 >("user/signupUser", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${API_URL}api/user/signup`, userData);
+    const response = await axios.post(`${API_URL}api/user/signup`, userData, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -90,6 +95,9 @@ const userSlice = createSlice({
     updateToken: (state, action) => {
       state.accessToken = action.payload;
     },
+    resetError(state) {
+      state.error = null; // エラーをリセット
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -99,7 +107,9 @@ const userSlice = createSlice({
       })
       .addCase(signupUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.userInfo = action.payload;
+        state.userInfo = action.payload.user;
+        state.accessToken = action.payload.accessToken;
+        localStorage.setItem("token", action.payload.accessToken);
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
@@ -133,5 +143,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { updateToken } = userSlice.actions;
+export const { updateToken, resetError } = userSlice.actions;
 export default userSlice.reducer;

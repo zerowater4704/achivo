@@ -2,16 +2,17 @@ export interface IGoal {
   _id: string;
   title: string;
   description: string;
-  status: string;
+  isCompleted: boolean;
+  progress: number;
   startDate: string;
   finishDate: string;
   plan_id: string[];
-  task_id: string[];
 }
 
 export interface GoalState {
   goals: IGoal[];
   selectedGoal: IGoal | null;
+  progress: number | null;
   loading: boolean;
   error: string | null;
 }
@@ -23,11 +24,9 @@ export interface ErrorResponse {
 export interface GoalFormInputs {
   title: string;
   description: string;
-  status: string;
   startDate: string;
   finishDate: string;
   plan_id: string[];
-  task_id: string[];
 }
 
 export interface UpdateGoalProps {
@@ -35,7 +34,8 @@ export interface UpdateGoalProps {
     _id: string;
     title: string;
     description: string;
-    status: string;
+    isCompleted: boolean;
+    progress: number;
     startDate: string;
     finishDate: string;
   };

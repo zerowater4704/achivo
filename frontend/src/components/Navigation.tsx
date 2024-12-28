@@ -18,14 +18,15 @@ const Navigation: React.FC = () => {
     if (!token) {
       navigate("/");
     }
-  }, [navigate]);
+  }, [navigate, token]);
 
   return (
-    <header className=" bg-slate-800 shadow-sm leading-[34px] text-lg text-white">
-      <div>
-        <ul className="flex justify-between bg-zinc-800 py-2">
-          <li className=" mx-4">
-            <NavLink to="/">Logo</NavLink>
+    <header className=" bg-orange-300 text-white font-zen font-bold leading-[34px] text-xl shadow-sm px-3">
+      <div className="">
+        <ul className="flex justify-between py-2">
+          <li className=" mx-4 flex space-x-1">
+            <img src="/マウンテンアイコン.png" className=" m-auto" />
+            <NavLink to="/">Achivo</NavLink>
           </li>
           {token && (
             <li className="mr-4">
@@ -36,15 +37,23 @@ const Navigation: React.FC = () => {
           )}
         </ul>
       </div>
-      <nav>
+      {/* <nav>
         <ul className="flex justify-end space-x-4 mr-4 py-2">
-          <li className=" space-x-4">
-            <NavLink to="/">Active</NavLink>
-            <NavLink to="/">Completed</NavLink>
-            <NavLink to="/">Failed</NavLink>
-          </li>
+          {token && (
+            <>
+              <li className=" ">
+                <NavLink to="/">Active</NavLink>
+              </li>
+              <li>
+                <NavLink to="/completed">Completed</NavLink>
+              </li>
+              <li>
+                <NavLink to="/">Failed</NavLink>
+              </li>
+            </>
+          )}
         </ul>
-      </nav>
+      </nav> */}
     </header>
   );
 };

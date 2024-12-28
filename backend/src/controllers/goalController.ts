@@ -9,11 +9,11 @@ export const createGoal = async (req: Request, res: Response) => {
     const {
       title,
       description,
-      status,
+      isCompleted,
+      progress,
       startDate,
       finishDate,
       plan_id,
-      task_id,
     } = req.body;
 
     if (!user) {
@@ -29,19 +29,19 @@ export const createGoal = async (req: Request, res: Response) => {
     if (new Date(finishDate) <= new Date(startDate)) {
       res
         .status(400)
-        .json({ message: "finishDateをstartDateより後に設定してください。" });
+        .json({ message: "終了日を開始日より後に設定してください。" });
       return;
     }
 
     const newGoal = new Goal({
       title,
       description,
-      status,
+      isCompleted,
+      progress,
       startDate: new Date(startDate),
       finishDate: new Date(finishDate),
       createdBy: user,
       plan_id,
-      task_id,
     });
 
     await newGoal.save();
@@ -97,11 +97,11 @@ export const updateGoal = async (req: Request, res: Response) => {
     const {
       title,
       description,
-      status,
+      isCompleted,
+      progress,
       startDate,
       finishDate,
       plan_id,
-      task_id,
     } = req.body;
 
     const goal = await Goal.findById(goalId);
@@ -123,7 +123,7 @@ export const updateGoal = async (req: Request, res: Response) => {
     ) {
       res
         .status(400)
-        .json({ message: "finishDateをstartDateより後に設定してください。" });
+        .json({ message: "終了日を開始日より後に設定してください。" });
       return;
     }
 
@@ -132,11 +132,11 @@ export const updateGoal = async (req: Request, res: Response) => {
       {
         title,
         description,
-        status,
+        isCompleted,
+        progress,
         startDate: new Date(startDate),
         finishDate: new Date(finishDate),
         plan_id,
-        task_id,
       },
       { new: true, runValidators: true }
     );
@@ -168,7 +168,6 @@ export const deleteGoal = async (req: Request, res: Response) => {
     }
 
     await Plan.deleteMany({ goal_id: goalId });
-    await Task.deleteMany({ goal_id: goalId });
 
     await goal.deleteOne();
 

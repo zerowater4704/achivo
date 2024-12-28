@@ -12,21 +12,20 @@ const user_1 = __importDefault(require("./routes/user"));
 const goal_1 = __importDefault(require("./routes/goal"));
 const plan_1 = __importDefault(require("./routes/plan"));
 const task_1 = __importDefault(require("./routes/task"));
+const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const passport_1 = __importDefault(require("passport"));
-const passport_2 = __importDefault(require("./config/passport"));
 const app = (0, express_1.default)();
-const PORT = 3000;
+const PORT = process.env.PORT;
 dotenv_1.default.config();
 (0, db_1.default)();
 app.use((0, cors_1.default)({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
 }));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.use(passport_1.default.initialize());
-(0, passport_2.default)(passport_1.default);
-// app.use("/auth/", authRouter);
+app.use("/auth", authRoutes_1.default);
 app.use("/api/user", user_1.default);
 app.use("/api/goal", goal_1.default);
 app.use("/api/plan", plan_1.default);

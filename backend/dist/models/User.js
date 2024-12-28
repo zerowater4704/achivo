@@ -38,6 +38,7 @@ const userSchema = new mongoose_1.Schema({
     email: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     password: { type: String, required: true },
+    googleId: { type: String },
 }, {
     timestamps: true,
 });

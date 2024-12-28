@@ -2,7 +2,7 @@ export interface ITask {
   _id: string;
   title: string;
   description: string;
-  status: string;
+  isCompleted: boolean;
   startDate: string;
   finishDate: string;
   goal_id: string;
@@ -13,6 +13,7 @@ export interface TaskState {
   tasks: ITask[];
   selectedTask: ITask | null;
   selectedPlan: ITask | null;
+  isCompleted: boolean;
   loading: boolean;
   error: string | null;
   planId: string | null;
@@ -25,7 +26,6 @@ export interface ErrorResponse {
 export interface TaskFormInput {
   title: string;
   description: string;
-  status: string;
   startDate: string;
   finishDate: string;
   goal_id: string;
@@ -37,7 +37,7 @@ export interface UpdateTaskProps {
     _id: string;
     title: string;
     description: string;
-    status: string;
+    isCompleted: boolean;
     startDate: string;
     finishDate: string;
     goal_id: string;

@@ -2,7 +2,8 @@ export interface IPlan {
   _id: string;
   title: string;
   description: string;
-  status: string;
+  isCompleted: boolean;
+  progress: number;
   startDate: string;
   finishDate: string;
   goal_id: string;
@@ -13,6 +14,8 @@ export interface PlanState {
   plans: IPlan[];
   selectedGoal: IPlan | null;
   selectedPlan: IPlan | null;
+  progress: number | null;
+  isCompleted: boolean;
   loading: boolean;
   error: string | null;
   goalId: string | null;
@@ -25,7 +28,6 @@ export interface ErrorResponse {
 export interface PlanFormInput {
   title: string;
   description: string;
-  status: string;
   startDate: string;
   finishDate: string;
   goal_id: string;
@@ -37,7 +39,8 @@ export interface UpdatePlanProps {
     _id: string;
     title: string;
     description: string;
-    status: string;
+    isCompleted: boolean;
+    progress: number;
     startDate: string;
     finishDate: string;
     goal_id: string;

@@ -8,10 +8,14 @@ import {
 } from "../../store/features/plan/planSlice";
 import InputForm from "../InputForm";
 import PlanList from "./PlanList";
+import { motion } from "framer-motion";
+import { FaPlus } from "react-icons/fa";
 
 const CreatePlan: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRotated, setIsRotated] = useState(false);
   const { selectedGoal } = useAppSelector((state) => state.goal);
+  const { error, loading } = useAppSelector((state) => state.plan);
   const dispatch = useAppDispatch();
 
   const {
@@ -23,7 +27,6 @@ const CreatePlan: React.FC = () => {
     defaultValues: {
       title: "",
       description: "",
-      status: "未着手",
       startDate: "",
       finishDate: "",
     },
@@ -38,75 +41,99 @@ const CreatePlan: React.FC = () => {
   const onSubmit: SubmitHandler<PlanFormInput> = async (data) => {
     const result = await dispatch(createPlan(data)).unwrap();
     if (result) {
-      setIsModalOpen(false);
+      setIsModalOpen((prev) => !prev);
+      setIsRotated((prev) => !prev);
       reset();
     }
   };
 
   const handleOpenModal = () => {
-    setIsModalOpen(true);
+    setIsModalOpen((prev) => !prev);
+    setIsRotated((prev) => !prev);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    setIsModalOpen((prev) => !prev);
+    setIsRotated((prev) => !prev);
     reset();
   };
 
   return (
-    <div>
+    <>
       <div className="flex justify-between py-3 px-3 text-lg border-b-2 border-orange-400">
-        <p className=" items-center">計画</p>
+        <p className="font-semibold">計画</p>
         {selectedGoal && (
-          <button onClick={handleOpenModal} className="  ">
-            Add Plan
-          </button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 500 }}
+            onClick={handleOpenModal}
+            className="  "
+          >
+            <motion.span
+              animate={{ rotate: isRotated ? 45 : 0 }}
+              className=" block"
+            >
+              {" "}
+              <FaPlus />
+            </motion.span>
+          </motion.button>
         )}
       </div>
       {isModalOpen ? (
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <InputForm
-            type="text"
-            label="Title"
-            {...register("title", { required: "" })}
-          />
-          <InputForm
-            type="text"
-            label="Description"
-            {...register("description", { required: "" })}
-          />
+        <motion.div
+          variants={{
+            hidden: { opacity: 0, y: 30 },
+            visible: { opacity: 1, y: 0 },
+          }}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          transition={{ duration: 0.5 }}
+        >
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <InputForm
+              label="タイトル"
+              type="text"
+              {...register("title", { required: "必須項目です。" })}
+            />
+            {errors.title && <p>{errors.title.message}</p>}
+            <InputForm
+              label="詳細"
+              type="text"
+              {...register("description", { required: "必須項目です。" })}
+            />
+            {errors.description && <p>{errors.description.message}</p>}
+            <InputForm
+              label="開始日"
+              type="date"
+              {...register("startDate", { required: "必須項目です。" })}
+            />
+            {errors.startDate && <p>{errors.startDate.message}</p>}
+            <InputForm
+              label="終了日"
+              type="date"
+              {...register("finishDate", { required: "必須項目です。" })}
+            />
+            {errors.finishDate && <p>{errors.finishDate.message}</p>}
 
-          <div>
-            <label className="block py-2 px-3">
-              Status <span className=" text-red-600 text-sm pl-1">*必須</span>
-            </label>
-            <select
-              {...register("status")}
-              className=" bg-gray-50 border border-gray-300 rounded-md text-gray-900 text-sm focus:ring-yellow-500 focus:border-yellow-500 block"
-            >
-              <option value="未着手">未着手</option>
-              <option value="進行中">進行中</option>
-              <option value="完了">完了</option>
-            </select>
-          </div>
-
-          <InputForm
-            label="Start Date"
-            type="date"
-            {...register("startDate", { required: "" })}
-          />
-          <InputForm
-            label="Finish Date"
-            type="date"
-            {...register("finishDate", { required: "" })}
-          />
-
-          <button type="submit">Create Plan</button>
-          <button onClick={handleCloseModal}>Close</button>
-        </form>
+            {error && <p className=" text-red-600">{error}</p>}
+            <div className=" my-2 flex justify-end space-x-4">
+              <button type="submit" className="transform active:translate-y-1">
+                {loading ? "計画作成中..." : "計画作成"}
+              </button>
+              <button
+                onClick={handleCloseModal}
+                className="pr-3 transform active:translate-y-1"
+              >
+                キャンセル
+              </button>
+            </div>
+          </form>
+        </motion.div>
       ) : (
         <>{selectedGoal && <PlanList />}</>
       )}
-    </div>
+    </>
   );
 };
 

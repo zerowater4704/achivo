@@ -10,7 +10,7 @@ const Task_1 = __importDefault(require("../models/Task"));
 const createPlan = async (req, res) => {
     var _a;
     try {
-        const { title, description, status, startDate, finishDate, goal_id, task_id, } = req.body;
+        const { title, description, isCompleted, progress, startDate, finishDate, goal_id, task_id, } = req.body;
         const user = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
         if (!user) {
             res.status(400).json({ message: "ユーザーが見つかりません。" });
@@ -28,13 +28,14 @@ const createPlan = async (req, res) => {
         if (new Date(finishDate) <= new Date(startDate)) {
             res
                 .status(400)
-                .json({ message: "finishDateをstartDateより後に設定してください。" });
+                .json({ message: "終了日を開始日より後に設定してください。" });
             return;
         }
         const newPlan = new Plan_1.default({
             title,
             description,
-            status,
+            isCompleted,
+            progress,
             startDate: new Date(startDate),
             finishDate: new Date(finishDate),
             createdBy: user,
@@ -44,7 +45,12 @@ const createPlan = async (req, res) => {
         await newPlan.save();
         findGoal.plan_id.push(newPlan.id);
         await findGoal.save();
-        res.status(200).json({ newPlan });
+        const relatedGoals = await Plan_1.default.find({ goal_id: findGoal });
+        const completedPlans = relatedGoals.filter((goal) => goal.isCompleted).length;
+        const totalGoal = relatedGoals.length;
+        const goalProgress = totalGoal > 0 ? Math.ceil((completedPlans / totalGoal) * 100) : 0;
+        const findUpdateGoal = await Goal_1.default.findByIdAndUpdate(findGoal, { progress: goalProgress }, { new: true });
+        res.status(200).json({ newPlan: newPlan, goal: findUpdateGoal });
     }
     catch (error) {
         res.status(500).json({ message: "createPlan Apiエラーです" });
@@ -108,7 +114,7 @@ const updatePlan = async (req, res) => {
     var _a;
     try {
         const user = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-        const { title, description, status, startDate, finishDate, task_id, goal_id, } = req.body;
+        const { title, description, isCompleted, progress, startDate, finishDate, task_id, goal_id, } = req.body;
         const goalId = req.params.id;
         const planId = req.params.planId;
         const plan = await Plan_1.default.findOne({ goal_id: goalId, _id: planId });
@@ -131,13 +137,14 @@ const updatePlan = async (req, res) => {
         if (new Date(finishDate) <= new Date(startDate)) {
             res
                 .status(400)
-                .json({ message: "finishDateをstartDateより後に設定してください。" });
+                .json({ message: "終了日を開始日より後に設定してください。" });
             return;
         }
         const updatedPlan = await Plan_1.default.findByIdAndUpdate(planId, {
             title,
             description,
-            status,
+            isCompleted,
+            progress,
             startDate: new Date(startDate),
             finishDate: new Date(finishDate),
             task_id,
@@ -176,8 +183,6 @@ const deletePlan = async (req, res) => {
             res.status(400).json({ message: "削除する権限がありません。" });
             return;
         }
-        const tasks = await Task_1.default.find({ plan_id: planId });
-        const taskIds = tasks.map((task) => task._id);
         await Task_1.default.deleteMany({ plan_id: planId });
         const deletedPlan = await Plan_1.default.findByIdAndDelete(planId);
         if (!deletedPlan) {
@@ -187,9 +192,13 @@ const deletePlan = async (req, res) => {
         await Goal_1.default.findByIdAndUpdate(deletedPlan.goal_id, {
             $pull: {
                 plan_id: planId,
-                task_id: { $in: taskIds },
             },
         });
+        const relatedGoals = await Plan_1.default.find({ goal_id: plan.goal_id });
+        const completedPlans = relatedGoals.filter((goal) => goal.isCompleted).length;
+        const totalGoal = relatedGoals.length;
+        const goalProgress = totalGoal > 0 ? Math.ceil((completedPlans / totalGoal) * 100) : 0;
+        const findUpdateGoal = await Goal_1.default.findByIdAndUpdate(plan.goal_id, { progress: goalProgress }, { new: true });
         res.status(200).json({ message: "planを削除しました。" });
     }
     catch (error) {

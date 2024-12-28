@@ -37,11 +37,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const taskSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    status: {
-        type: String,
-        enum: ["未着手", "進行中", "完了"],
-        default: "未着手",
-    },
+    isCompleted: { type: Boolean, default: false },
     startDate: { type: Date, required: true },
     finishDate: {
         type: Date,
@@ -55,11 +51,6 @@ const taskSchema = new mongoose_1.Schema({
     plan_id: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: "Plan",
-        required: true,
-    },
-    goal_id: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: "Goal",
         required: true,
     },
 }, { timestamps: true });

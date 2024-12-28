@@ -11,6 +11,7 @@ import axiosInstance from "../../../hooks/useAxios";
 const initialState: GoalState = {
   goals: [],
   selectedGoal: null,
+  progress: null,
   loading: false,
   error: null,
 };
@@ -40,7 +41,6 @@ export const goalList = createAsyncThunk<
 >("goal/goalList", async (_, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get("api/goal/goals");
-    console.log(response);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -75,6 +75,7 @@ export const updateGoal = createAsyncThunk<
 >("goal/updateGOal", async ({ id, goalData }, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.put(`api/goal/goals/${id}`, goalData);
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -105,7 +106,11 @@ export const deleteGoal = createAsyncThunk<
 const goalSlice = createSlice({
   name: "goal",
   initialState,
-  reducers: {},
+  reducers: {
+    resetError(state) {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createGoal.pending, (state) => {
@@ -180,4 +185,5 @@ const goalSlice = createSlice({
   },
 });
 
+export const { resetError } = goalSlice.actions;
 export default goalSlice.reducer;

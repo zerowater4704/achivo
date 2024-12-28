@@ -3,23 +3,20 @@ import mongoose, { Schema, Document } from "mongoose";
 interface IGoal extends Document {
   title: string;
   description: string;
-  status: string;
+  isCompleted: boolean;
+  progress: number;
   startDate: Date;
   finishDate: Date;
   createdBy: mongoose.Schema.Types.ObjectId;
   plan_id: mongoose.Schema.Types.ObjectId[];
-  task_id: mongoose.Schema.Types.ObjectId[];
 }
 
 const goalSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    status: {
-      type: String,
-      enum: ["未着手", "進行中", "完了"],
-      default: "未着手",
-    },
+    isCompleted: { type: Boolean, default: false },
+    progress: { type: Number, default: 0, min: 0, max: 100 },
     startDate: { type: Date, required: true },
     finishDate: {
       type: Date,
@@ -31,12 +28,6 @@ const goalSchema: Schema = new Schema(
       required: true,
     },
     plan_id: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Plan",
-      },
-    ],
-    task_id: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Plan",

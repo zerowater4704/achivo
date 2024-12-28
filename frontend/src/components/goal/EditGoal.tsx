@@ -1,11 +1,13 @@
-import { useAppDispatch } from "../../hooks/hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { GoalFormInputs } from "../../types/goal";
 import { UpdateGoalProps } from "../../types/goal";
 import { updateGoal } from "../../store/features/goal/goalSlice";
 import { useForm, SubmitHandler } from "react-hook-form";
+import InputForm from "../InputForm";
 
 const EditGoal: React.FC<UpdateGoalProps> = ({ goal, onCancel }) => {
   const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.goal);
 
   const {
     register,
@@ -15,7 +17,6 @@ const EditGoal: React.FC<UpdateGoalProps> = ({ goal, onCancel }) => {
     defaultValues: {
       title: goal.title,
       description: goal.description,
-      status: goal.status,
       startDate: goal.startDate,
       finishDate: goal.finishDate,
     },
@@ -29,37 +30,41 @@ const EditGoal: React.FC<UpdateGoalProps> = ({ goal, onCancel }) => {
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex justify-between mb-1">
-          <div className=" space-x-3">
-            <label className="text-xl">Title:</label>
-            <input type="text" {...register("title", { required: "" })} />
-          </div>
-          <div className=" space-x-4 items-center">
-            <button type="submit">Save</button>
-            <button onClick={onCancel}>Cancel</button>
-          </div>
-        </div>
-        <input type="text" {...register("description", { required: "" })} />
-
-        <div>
-          <label>Status</label>
-          <select {...register("status")}>
-            <option value="未着手">未着手</option>
-            <option value="進行中">進行中</option>
-            <option value="完了">完了</option>
-          </select>
-        </div>
-
-        <input
-          type="date"
-          {...register("startDate", { required: "" })}
-          className="block"
+        <InputForm
+          label="タイトル"
+          type="text"
+          {...register("title", { required: "必須項目です。" })}
         />
-        <input
-          type="date"
-          {...register("finishDate", { required: "" })}
-          className="block"
+        {errors.title && <p>{errors.title.message}</p>}
+        <InputForm
+          label="詳細"
+          type="text"
+          {...register("description", { required: "必須項目です。" })}
         />
+        {errors.description && <p>{errors.description.message}</p>}
+        <InputForm
+          label="開始日"
+          type="date"
+          {...register("startDate", { required: "必須項目です。" })}
+        />
+        {errors.startDate && <p>{errors.startDate.message}</p>}
+        <InputForm
+          label="終了日"
+          type="date"
+          {...register("finishDate", { required: "必須項目です。" })}
+        />
+        {errors.finishDate && <p>{errors.finishDate.message}</p>}
+
+        {error && <p className=" text-red-600">{error}</p>}
+
+        <div className=" my-2 flex justify-end space-x-4">
+          <button type="submit" className="transform active:translate-y-1">
+            {loading ? "編集中..." : "編集"}
+          </button>
+          <button onClick={onCancel} className="pr-3 active:translate-y-1">
+            キャンセル
+          </button>
+        </div>
       </form>
     </>
   );

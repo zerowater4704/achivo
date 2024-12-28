@@ -2,24 +2,17 @@ import User from "../models/User";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload, VerifyErrors } from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { generateAccessToken, generateRefreshToken } from "../utils/token";
 
-export const createUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createUser = async (req: Request, res: Response) => {
   try {
     const { email, name, password } = req.body;
 
-    if (!email || !name || !password) {
-      res
-        .status(400)
-        .json({ message: "すべて必須フィールドを入力してください。" });
-      return;
-    }
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ message: "既に登録されています。" });
+      res
+        .status(400)
+        .json({ message: "既に登録されているメールアドレスです。" });
       return;
     }
 
@@ -31,9 +24,18 @@ export const createUser = async (
       password: hashedPassword,
     });
 
+    const accessToken = generateAccessToken({ id: user.id });
+    const refreshToken = generateRefreshToken({ id: user.id });
+
     await user.save();
-    res.status(200).json({ message: "ユーザー登録に成功しました。", user });
-    return;
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+      })
+      .json({ accessToken, user });
   } catch (error) {
     console.error("Error in createUser:", error);
     res.status(500).json({ message: "createUser apiのエラーです。", error });
@@ -47,23 +49,19 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.status(400).json({ message: "ユーザーが見つかりません。" });
+      res.status(400).json({
+        message: "入力されたメールアドレスが間違っています。",
+      });
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      res.status(401).json({ message: "パスワードを間違いました" });
+      res
+        .status(401)
+        .json({ message: "入力されたパスワードが間違っています。" });
       return;
     }
-
-    const generateAccessToken = (payload: object) => {
-      return jwt.sign(payload, process.env.ACCESS_TOKEN!, { expiresIn: "15m" });
-    };
-
-    const generateRefreshToken = (payload: object) => {
-      return jwt.sign(payload, process.env.REFRESH_TOKEN!, { expiresIn: "1d" });
-    };
 
     const accessToken = generateAccessToken({ id: user.id });
     const refreshToken = generateRefreshToken({ id: user.id });

@@ -9,14 +9,14 @@ const Main: React.FC = () => {
   return (
     <>
       <Navigation />
-      <main className="h-full flex bg-slate-50">
-        <section className="w-1/3 p-3 ">
+      <main className="md:flex md:w-full block mx-auto w-[500px]">
+        <section className="md:w-1/3 p-3 my-3 md:mr-4 font-zen">
           <CreateGoal />
         </section>
-        <section className="w-1/3 p-3">
+        <section className="md:w-1/3 p-3 my-3 md:mr-4 font-zen">
           <CreatePlan />
         </section>
-        <section className="w-1/3 p-3">
+        <section className="md:w-1/3 p-3 my-3 font-zen">
           <CreateTask />
         </section>
       </main>

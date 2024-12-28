@@ -13,6 +13,8 @@ const initialState: PlanState = {
   plans: [],
   selectedGoal: null,
   selectedPlan: null,
+  progress: null,
+  isCompleted: false,
   loading: false,
   error: null,
   goalId: null,
@@ -172,6 +174,7 @@ const planSlice = createSlice({
       })
       .addCase(updatePlan.fulfilled, (state, action: PayloadAction<IPlan>) => {
         state.loading = false;
+        console.log("Updated Plan:", action.payload);
         state.plans = state.plans.map((plan) =>
           plan._id === action.payload._id ? action.payload : plan
         );

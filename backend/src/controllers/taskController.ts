@@ -5,28 +5,15 @@ import Task from "../models/Task";
 
 export const createTask = async (req: Request, res: Response) => {
   try {
-    const {
-      title,
-      description,
-      status,
-      startDate,
-      finishDate,
-      goal_id,
-      plan_id,
-    } = req.body;
+    const { title, description, isCompleted, startDate, finishDate, plan_id } =
+      req.body;
     const user = req.user?.id;
 
     if (!user) {
       res.status(400).json({ message: "ユーザーが見つかりません。" });
       return;
     }
-    const findGoal = await Goal.findById(goal_id);
     const findPlan = await Plan.findById(plan_id);
-
-    if (!findGoal) {
-      res.status(400).json({ message: "goalがありません" });
-      return;
-    }
 
     if (!findPlan) {
       res.status(400).json({ message: "planがありません" });
@@ -41,29 +28,63 @@ export const createTask = async (req: Request, res: Response) => {
     if (new Date(finishDate) <= new Date(startDate)) {
       res
         .status(400)
-        .json({ message: "finishDateをstartDateより後に設定してください。" });
+        .json({ message: "終了日を開始日より後に設定してください。" });
       return;
     }
 
     const newTask = new Task({
       title,
       description,
-      status,
+      isCompleted,
       startDate: new Date(startDate),
       finishDate: new Date(finishDate),
       createdBy: user,
-      goal_id: findGoal,
       plan_id: findPlan,
     });
 
     await newTask.save();
 
-    findGoal.task_id.push(newTask.id);
-    await findGoal.save();
     findPlan.task_id.push(newTask.id);
     await findPlan.save();
 
-    res.status(200).json({ newTask });
+    const relatedTasks = await Task.find({ plan_id: findPlan });
+    const completedTasks = relatedTasks.filter(
+      (task) => task.isCompleted
+    ).length;
+    const totalTask = relatedTasks.length;
+    const planProgress =
+      totalTask > 0 ? Math.ceil((completedTasks / totalTask) * 100) : 0;
+    const isPlanComplete = planProgress === 100;
+
+    const finalUpdatedPlan = await Plan.findByIdAndUpdate(
+      findPlan,
+      { progress: planProgress, isCompleted: isPlanComplete },
+      { new: true }
+    );
+
+    if (!finalUpdatedPlan) {
+      res.status(404).json({ message: "Plan進捗の更新に失敗しました。" });
+      return;
+    }
+
+    const relatedPlans = await Plan.find({ goal_id: finalUpdatedPlan.goal_id });
+    const completedPlans = relatedPlans.filter(
+      (plan) => plan.isCompleted
+    ).length;
+    const totalPlan = relatedPlans.length;
+    const goalProgress =
+      totalPlan > 0 ? Math.ceil((completedPlans / totalPlan) * 100) : 0;
+    const isGoalComplete = goalProgress === 100;
+
+    const finalUpdatedGoal = await Goal.findByIdAndUpdate(
+      finalUpdatedPlan.goal_id,
+      { progress: goalProgress, isCompleted: isGoalComplete },
+      { new: true }
+    );
+
+    res
+      .status(200)
+      .json({ task: newTask, plan: finalUpdatedPlan, goal: finalUpdatedGoal });
   } catch (error) {
     res.status(500).json({ message: "createTask Apiエラーです。" });
     return;
@@ -130,15 +151,8 @@ export const getTask = async (req: Request, res: Response) => {
 export const updateTask = async (req: Request, res: Response) => {
   try {
     const user = req.user?.id;
-    const {
-      title,
-      description,
-      status,
-      startDate,
-      finishDate,
-      plan_id,
-      goal_id,
-    } = req.body;
+    const { title, description, isCompleted, startDate, finishDate, plan_id } =
+      req.body;
 
     const taskId = req.params.taskId;
     const planId = req.params.id;
@@ -168,7 +182,7 @@ export const updateTask = async (req: Request, res: Response) => {
     if (new Date(finishDate) <= new Date(startDate)) {
       res
         .status(400)
-        .json({ message: "finishDateをstartDateより後に設定してください。" });
+        .json({ message: "終了日を開始日より後に設定してください。" });
       return;
     }
 
@@ -177,11 +191,10 @@ export const updateTask = async (req: Request, res: Response) => {
       {
         title,
         description,
-        status,
+        isCompleted,
         startDate: new Date(startDate),
         finishDate: new Date(finishDate),
         plan_id,
-        goal_id,
       },
       { new: true }
     );
@@ -191,7 +204,40 @@ export const updateTask = async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(200).json(updatedTask);
+    const relatedPlan = await Task.find({ plan_id: planId });
+    const completedTask = relatedPlan.filter((task) => task.isCompleted).length;
+    const totalTask = relatedPlan.length;
+    const progress =
+      totalTask > 0 ? Math.ceil((completedTask / totalTask) * 100) : 0;
+
+    const isComplete = progress === 100;
+
+    const updatedPlan = await Plan.findByIdAndUpdate(
+      planId,
+      { progress, isCompleted: isComplete },
+      { new: true }
+    );
+
+    const relatedPlans = await Plan.find({ goal_id: updatedPlan?.goal_id });
+    const completedPlans = relatedPlans.filter(
+      (plan) => plan.isCompleted
+    ).length;
+    const totalPlans = relatedPlans.length;
+    const goalProgress =
+      totalPlans > 0 ? Math.ceil((completedPlans / totalPlans) * 100) : 0;
+
+    const updatedGoal = await Goal.findByIdAndUpdate(
+      updatedPlan?.goal_id,
+      { progress: goalProgress },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "taskの達成度からplanの達成度が更新されました。",
+      task: updatedTask,
+      plan: updatedPlan,
+      goal: updatedGoal,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "updateTask Apiエラーです。", error });
@@ -221,9 +267,65 @@ export const deleteTask = async (req: Request, res: Response) => {
       return;
     }
 
-    await Task.findByIdAndDelete(taskId);
+    const deletedTask = await Task.findByIdAndDelete(taskId);
 
-    res.status(200).json({ message: "taskを削除しました。" });
+    if (!deletedTask) {
+      res.status(404).json({ message: "Taskの削除に失敗しました。" });
+      return;
+    }
+
+    const updatedPlan = await Plan.findByIdAndUpdate(deletedTask?.plan_id, {
+      $pull: {
+        task_id: taskId,
+      },
+    });
+
+    if (!updatedPlan) {
+      res.status(404).json({ message: "Planの更新に失敗しました。" });
+      return;
+    }
+
+    const relatedTasks = await Task.find({ plan_id: deletedTask?.plan_id });
+    const completedTasks = relatedTasks.filter(
+      (task) => task.isCompleted
+    ).length;
+    const totalTask = relatedTasks.length;
+    const planProgress =
+      totalTask > 0 ? Math.ceil((completedTasks / totalTask) * 100) : 0;
+    const isPlanComplete = planProgress === 100;
+
+    const finalUpdatedPlan = await Plan.findByIdAndUpdate(
+      deletedTask?.plan_id,
+      { progress: planProgress, isCompleted: isPlanComplete },
+      { new: true }
+    );
+
+    if (!finalUpdatedPlan) {
+      res.status(404).json({ message: "Plan進捗の更新に失敗しました。" });
+      return;
+    }
+
+    const relatedPlans = await Plan.find({ goal_id: finalUpdatedPlan.goal_id });
+    const completedPlans = relatedPlans.filter(
+      (plan) => plan.isCompleted
+    ).length;
+    const totalPlan = relatedPlans.length;
+    const goalProgress =
+      totalPlan > 0 ? Math.ceil((completedPlans / totalPlan) * 100) : 0;
+    const isGoalComplete = goalProgress === 100;
+
+    const finalUpdatedGoal = await Goal.findByIdAndUpdate(
+      finalUpdatedPlan.goal_id,
+      { progress: goalProgress, isCompleted: isGoalComplete },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Taskを削除し、関連するPlanとGoalの達成度を更新しました。",
+      task: deletedTask,
+      plan: finalUpdatedPlan,
+      goal: finalUpdatedGoal,
+    });
   } catch (error) {
     res.status(500).json({ message: "deleteTask Apiエラーです。", error });
     return;

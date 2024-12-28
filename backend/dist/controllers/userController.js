@@ -7,18 +7,15 @@ exports.refreshAccessToken = exports.deleteUser = exports.logout = exports.login
 const User_1 = __importDefault(require("../models/User"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const token_1 = require("../utils/token");
 const createUser = async (req, res) => {
     try {
         const { email, name, password } = req.body;
-        if (!email || !name || !password) {
-            res
-                .status(400)
-                .json({ message: "すべて必須フィールドを入力してください。" });
-            return;
-        }
         const existingUser = await User_1.default.findOne({ email });
         if (existingUser) {
-            res.status(400).json({ message: "既に登録されています。" });
+            res
+                .status(400)
+                .json({ message: "既に登録されているメールアドレスです。" });
             return;
         }
         const hashedPassword = await bcrypt_1.default.hash(password, 10);
@@ -27,9 +24,17 @@ const createUser = async (req, res) => {
             name,
             password: hashedPassword,
         });
+        const accessToken = (0, token_1.generateAccessToken)({ id: user.id });
+        const refreshToken = (0, token_1.generateRefreshToken)({ id: user.id });
         await user.save();
-        res.status(200).json({ message: "ユーザー登録に成功しました。", user });
-        return;
+        res
+            .cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+        })
+            .json({ accessToken, user });
     }
     catch (error) {
         console.error("Error in createUser:", error);
@@ -43,22 +48,20 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body;
         const user = await User_1.default.findOne({ email });
         if (!user) {
-            res.status(400).json({ message: "ユーザーが見つかりません。" });
+            res.status(400).json({
+                message: "入力されたメールアドレスが間違っています。",
+            });
             return;
         }
         const isMatch = await bcrypt_1.default.compare(password, user.password);
         if (!isMatch) {
-            res.status(401).json({ message: "パスワードを間違いました" });
+            res
+                .status(401)
+                .json({ message: "入力されたパスワードが間違っています。" });
             return;
         }
-        const generateAccessToken = (payload) => {
-            return jsonwebtoken_1.default.sign(payload, process.env.ACCESS_TOKEN, { expiresIn: "15m" });
-        };
-        const generateRefreshToken = (payload) => {
-            return jsonwebtoken_1.default.sign(payload, process.env.REFRESH_TOKEN, { expiresIn: "1d" });
-        };
-        const accessToken = generateAccessToken({ id: user.id });
-        const refreshToken = generateRefreshToken({ id: user.id });
+        const accessToken = (0, token_1.generateAccessToken)({ id: user.id });
+        const refreshToken = (0, token_1.generateRefreshToken)({ id: user.id });
         res
             .cookie("refreshToken", refreshToken, {
             httpOnly: true,

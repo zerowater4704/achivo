@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import axiosInstance from "../../../hooks/useAxios";
 
 interface UserInfo {
   email: string;
@@ -32,7 +31,7 @@ export const signupUser = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("user/signupUser", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${API_URL}api/user/signup`, userData, {
+    const response = await axiosInstance.post(`api/user/signup`, userData, {
       withCredentials: true,
     });
     return response.data;
@@ -51,7 +50,7 @@ export const loginUser = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("user/loginUser", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${API_URL}api/user/login`, userData, {
+    const response = await axiosInstance.post(`api/user/login`, userData, {
       withCredentials: true,
     });
     const { user, accessToken } = response.data;
@@ -69,8 +68,8 @@ export const logoutUser = createAsyncThunk(
   "user/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      await axios.post(
-        `${API_URL}api/user/logout`,
+      await axiosInstance.post(
+        `api/user/logout`,
         {},
         { withCredentials: true }
       );

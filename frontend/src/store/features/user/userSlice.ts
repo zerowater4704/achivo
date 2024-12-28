@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import axiosInstance from "../../../hooks/useAxios";
+
 interface UserInfo {
   email: string;
   name: string;

@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 async function generateRandomPassword() {
   const rawPassword = Math.random().toString(36).slice(-10);

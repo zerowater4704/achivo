@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import axiosInstance from "../../../hooks/useAxios";
-
 interface UserInfo {
   email: string;
   name: string;
@@ -31,7 +30,7 @@ export const signupUser = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("user/signupUser", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post(`user/signup`, userData, {
+    const response = await axiosInstance.post(`api/user/signup`, userData, {
       withCredentials: true,
     });
     return response.data;
@@ -50,7 +49,7 @@ export const loginUser = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("user/loginUser", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post(`user/login`, userData, {
+    const response = await axiosInstance.post(`api/user/login`, userData, {
       withCredentials: true,
     });
     const { user, accessToken } = response.data;
@@ -68,7 +67,11 @@ export const logoutUser = createAsyncThunk(
   "user/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      await axiosInstance.post(`user/logout`, {}, { withCredentials: true });
+      await axiosInstance.post(
+        `api/user/logout`,
+        {},
+        { withCredentials: true }
+      );
       localStorage.removeItem("token");
       return true;
     } catch (error) {

@@ -34,7 +34,7 @@ export const createTask = createAsyncThunk<
     return rejectWithValue({ message: "目標を選択してください。" });
   }
   try {
-    const response = await axiosInstance.post("task/create", {
+    const response = await axiosInstance.post("api/task/create", {
       ...taskData,
       goal_id: goalId?._id,
       plan_id: planId._id,
@@ -56,7 +56,7 @@ export const taskList = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("task/taskList", async (planId, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`task/tasks/${planId}`);
+    const response = await axiosInstance.get(`api/task/tasks/${planId}`);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -73,7 +73,9 @@ export const getTaskById = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("task/getTaskById", async ({ planId, taskId }, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`task/tasks/${planId}/${taskId}`);
+    const response = await axiosInstance.get(
+      `api/task/tasks/${planId}/${taskId}`
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -93,7 +95,7 @@ export const updateTask = createAsyncThunk<
   async ({ planId, taskId, taskData }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.put(
-        `task/tasks/${planId}/${taskId}`,
+        `/api/task/tasks/${planId}/${taskId}`,
         taskData
       );
       return response.data.task;
@@ -113,7 +115,7 @@ export const deleteTask = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("task/deleteTask", async (taskId, { rejectWithValue }) => {
   try {
-    await axiosInstance.delete(`task/tasks/${taskId}`);
+    await axiosInstance.delete(`api/task/tasks/${taskId}`);
     return taskId;
   } catch (error) {
     if (axios.isAxiosError(error)) {

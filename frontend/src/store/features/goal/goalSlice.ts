@@ -23,7 +23,7 @@ export const createGoal = createAsyncThunk<
   { rejectValue: ErrorResponse } // ThunkApiConfig: エラーレスポンス型
 >("goal/create", async (goalData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post(`goal/create`, goalData);
+    const response = await axiosInstance.post(`api/goal/create`, goalData);
     return response.data.newGoal;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -40,7 +40,7 @@ export const goalList = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("goal/goalList", async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get("goal/goals");
+    const response = await axiosInstance.get("api/goal/goals");
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -57,7 +57,7 @@ export const getGoalById = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("goal/getGoalById", async (goalId, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`goal/goals/${goalId}`);
+    const response = await axiosInstance.get(`api/goal/goals/${goalId}`);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -74,7 +74,7 @@ export const updateGoal = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("goal/updateGOal", async ({ id, goalData }, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.put(`goal/goals/${id}`, goalData);
+    const response = await axiosInstance.put(`api/goal/goals/${id}`, goalData);
 
     return response.data;
   } catch (error) {
@@ -92,7 +92,7 @@ export const deleteGoal = createAsyncThunk<
   { rejectValue: ErrorResponse }
 >("goal/deleteGoal", async (goalId, { rejectWithValue }) => {
   try {
-    await axiosInstance.delete(`goal/goals/${goalId}`);
+    await axiosInstance.delete(`api/goal/goals/${goalId}`);
     return goalId;
   } catch (error) {
     if (axios.isAxiosError(error)) {

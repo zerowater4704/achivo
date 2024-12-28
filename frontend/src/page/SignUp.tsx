@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Modal from "react-modal";
+import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { signupUser } from "../store/features/user/userSlice";
@@ -17,7 +16,6 @@ const Signup: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { userInfo, loading, error } = useAppSelector((state) => state.user);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     register,
@@ -42,10 +40,6 @@ const Signup: React.FC = () => {
     }
   }, [userInfo, navigate]);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    navigate("/");
-  };
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -95,14 +89,6 @@ const Signup: React.FC = () => {
           </span>
         </button>
       </form>
-
-      {/* <Modal isOpen={isModalOpen}>
-        <h2>登録が完了しました！</h2>
-        <p>ログインページに移動します。</p>
-        <button onClick={handleCloseModal} className="close-button">
-          OK
-        </button>
-      </Modal> */}
     </>
   );
 };

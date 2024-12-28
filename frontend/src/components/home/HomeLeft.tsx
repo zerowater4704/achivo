@@ -33,7 +33,7 @@ const HomeLeft: React.FC = () => {
   };
 
   const handleLogin = () => {
-    const googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+    const googleAuthUrl = import.meta.env.VITE_GOOGLE_AUTH_URL;
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
       redirect_uri: import.meta.env.VITE_GOOGLE_CALLBACK,

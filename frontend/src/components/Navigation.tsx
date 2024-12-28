@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { logoutUser } from "../store/features/user/userSlice";
 import { NavLink, Link, useNavigate } from "react-router-dom";

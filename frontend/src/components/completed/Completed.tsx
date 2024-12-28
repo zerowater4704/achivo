@@ -6,7 +6,6 @@ const Completed: React.FC = () => {
   const { accessToken } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const { goals } = useAppSelector((state) => state.goal);
-  const { tasks } = useAppSelector((state) => state.task);
   const completedGoal = goals.filter((goal) => goal.isCompleted);
   useEffect(() => {
     if (completedGoal) {

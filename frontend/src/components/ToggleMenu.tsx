@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { FaEllipsisH, FaEdit } from "react-icons/fa";
-import { MdDeleteForever } from "react-icons/md";
+import { FaEllipsisH } from "react-icons/fa";
 
 interface ToggleMenuProps {
   todoId: string; // ID

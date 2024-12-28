@@ -33,13 +33,13 @@ const HomeLeft: React.FC = () => {
   };
 
   const handleLogin = () => {
-    const googleAuthUrl = import.meta.env.VITE_GOOGLE_AUTH_URL;
+    const googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth";
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
       redirect_uri: import.meta.env.VITE_GOOGLE_CALLBACK,
       response_type: "code",
-      scope: "email profile",
-      access_type: "offline",
+      scope: "email profile", // 必須スコープを追加
+      access_type: "offline", // 必要に応じて追加
     });
 
     window.location.href = `${googleAuthUrl}?${params.toString()}`;

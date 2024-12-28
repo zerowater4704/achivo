@@ -71,10 +71,10 @@ export const loginUser = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
+        path: "/",
         maxAge: 1 * 24 * 60 * 60 * 1000,
       })
       .json({ accessToken, user });
-    console.log("Cookies received in login:", req.cookies);
   } catch (error) {
     res.status(500).json({ message: "loginUser APIのエラーです。", error });
     return;
@@ -83,7 +83,6 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const logout = (req: Request, res: Response) => {
   try {
-    console.log("Cookies received in logout:", req.cookies);
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {

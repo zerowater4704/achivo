@@ -1,12 +1,23 @@
 import passport from "passport";
-import { Strategy as GoogleStrategy, Profile } from "passport-google-oauth20";
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import {
+  Strategy as JwtStrategy,
+  ExtractJwt,
+  VerifiedCallback,
+} from "passport-jwt";
 import User from "../models/User";
 import dotenv from "dotenv";
 import generateRandomPassword from "../utils/generateRandomPassword";
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 
 dotenv.config();
+
+interface GoogleProfile {
+  id: string;
+  displayName: string;
+  emails?: Array<{ value: string }>;
+  photos?: Array<{ value: string }>;
+}
 
 passport.use(
   new GoogleStrategy(
@@ -18,8 +29,8 @@ passport.use(
     async (
       _accessToken: string,
       _refreshToken: string | undefined,
-      profile: Profile,
-      done
+      profile: GoogleProfile,
+      done: VerifiedCallback
     ) => {
       try {
         let user = await User.findOne({ googleId: profile.id });

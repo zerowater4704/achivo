@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.refreshAccessToken = exports.deleteUser = exports.logout = exports.loginUser = exports.createUser = void 0;
 const User_1 = __importDefault(require("../models/User"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const token_1 = require("../utils/token");
 const createUser = async (req, res) => {
     try {
@@ -18,7 +18,7 @@ const createUser = async (req, res) => {
                 .json({ message: "既に登録されているメールアドレスです。" });
             return;
         }
-        const hashedPassword = await bcrypt_1.default.hash(password, 10);
+        const hashedPassword = await bcryptjs_1.default.hash(password, 10);
         const user = new User_1.default({
             email,
             name,
@@ -53,7 +53,7 @@ const loginUser = async (req, res) => {
             });
             return;
         }
-        const isMatch = await bcrypt_1.default.compare(password, user.password);
+        const isMatch = await bcryptjs_1.default.compare(password, user.password);
         if (!isMatch) {
             res
                 .status(401)
@@ -106,7 +106,7 @@ const deleteUser = async (req, res) => {
             res.status(400).json({ message: "ユーザーを見つかりません。" });
             return;
         }
-        const isMatch = await bcrypt_1.default.compare(password, user.password);
+        const isMatch = await bcryptjs_1.default.compare(password, user.password);
         if (!isMatch) {
             res.status(400).json({ message: "パスワードが間違っています。" });
             return;

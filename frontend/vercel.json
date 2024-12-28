@@ -3,6 +3,7 @@
     {
       "source": "/api/:path*",
       "destination": "https://achivo.onrender.com/:path*"
-    }
+    },
+    { "source": "/(.*)", "destination": "/" }
   ]
 }

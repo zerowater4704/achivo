@@ -10,6 +10,7 @@ const Navigation: React.FC = () => {
   const token = localStorage.getItem("token") || accessToken;
   const handelLogout = () => {
     dispatch(logoutUser()).then(() => {
+      localStorage.removeItem("token");
       navigate("/");
     });
   };

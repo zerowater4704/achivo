@@ -32,7 +32,7 @@ export const createUser = async (req: Request, res: Response) => {
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "none",
         maxAge: 1 * 24 * 60 * 60 * 1000,
       })
       .json({ accessToken, user });
@@ -70,7 +70,7 @@ export const loginUser = async (req: Request, res: Response) => {
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "none",
         path: "/",
         maxAge: 1 * 24 * 60 * 60 * 1000,
       })
@@ -93,7 +93,7 @@ export const logout = (req: Request, res: Response) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",
     });
 
     res.status(200).json({ message: "LogOutできました。" });

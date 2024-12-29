@@ -21,11 +21,11 @@ const Navigation: React.FC = () => {
   }, [navigate, token]);
 
   return (
-    <header className=" bg-orange-300 text-white font-zen font-bold leading-[34px] text-xl shadow-sm px-3">
+    <header className="w-full bg-orange-300 text-white font-zen font-bold leading-[34px] text-xl shadow-sm px-3">
       <div className="">
         <ul className="flex justify-between py-2">
-          <li className=" mx-4 flex space-x-1">
-            <img src="/マウンテンアイコン.png" className=" m-auto" />
+          <li className=" flex space-x-1 items-center">
+            <img src="/マウンテンアイコン.png" className=" h-6 w-6" />
             <NavLink to="/">Achivo</NavLink>
           </li>
           {token && (

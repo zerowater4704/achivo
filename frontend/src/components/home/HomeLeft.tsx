@@ -69,10 +69,10 @@ const HomeLeft: React.FC = () => {
           会員登録
         </button>
       </div>
-      <section className="w-[400px] md:w-[200px] mx-auto">
+      <section className="w-full sm:w-[400px] md:w-[300px] mx-auto">
         {isLogin ? (
           <>
-            <div className="border-double border-b-2 border-yellow-500 mb-6 pb-6">
+            {/* <div className="border-double border-b-2 border-yellow-500 mb-6 pb-6">
               <button
                 onClick={handleLogin}
                 className="bg-amber-800 text-white w-full py-2 rounded-md flex justify-center items-center font-bold"
@@ -82,12 +82,12 @@ const HomeLeft: React.FC = () => {
                 </span>
                 Google Login
               </button>
-            </div>
+            </div> */}
             <Login />
           </>
         ) : (
           <>
-            <div className="border-double border-b-2 border-yellow-500 mb-6 pb-6">
+            {/* <div className="border-double border-b-2 border-yellow-500 mb-6 pb-6">
               <button
                 onClick={handleLogin}
                 className="bg-amber-800 text-white w-full py-2 rounded-md flex justify-center items-center font-bold"
@@ -97,7 +97,7 @@ const HomeLeft: React.FC = () => {
                 </span>
                 Google SignUp
               </button>
-            </div>
+            </div> */}
             <Signup />
           </>
         )}

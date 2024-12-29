@@ -8,7 +8,7 @@ const Main: React.FC = () => {
   return (
     <>
       <Navigation />
-      <main className="md:flex md:w-full block mx-auto w-[500px]">
+      <main className="md:flex md:w-full  block mx-auto">
         <section className="md:w-1/3 p-3 my-3 md:mr-4 font-zen">
           <CreateGoal />
         </section>

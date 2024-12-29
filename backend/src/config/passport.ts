@@ -35,6 +35,7 @@ passport.use(
       done: VerifiedCallback
     ) => {
       try {
+        console.log("Google Profile:", profile);
         let user = await User.findOne({ googleId: profile.id });
 
         if (!user) {

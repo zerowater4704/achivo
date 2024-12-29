@@ -35,7 +35,11 @@ passport.use(
       done: VerifiedCallback
     ) => {
       try {
-        console.log("Google Profile:", profile);
+        if (!profile || !profile.id) {
+          throw new Error(
+            "Profile is undefined or missing required properties"
+          );
+        }
         let user = await User.findOne({ googleId: profile.id });
 
         if (!user) {

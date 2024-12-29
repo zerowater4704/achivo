@@ -1,4 +1,4 @@
-import passport from "passport";
+import passport, { Profile } from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import {
   Strategy as JwtStrategy,
@@ -9,7 +9,6 @@ import User from "../models/User";
 import dotenv from "dotenv";
 import generateRandomPassword from "../utils/generateRandomPassword";
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
-import { Profile } from "passport-google-oauth";
 
 dotenv.config();
 

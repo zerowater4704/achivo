@@ -26,7 +26,6 @@ passport.use(
       clientSecret: process.env.CLIENTSECRET!,
       callbackURL: process.env.GOOGLE_CALLBACK,
       passReqToCallback: true,
-      accessType: "offline",
     },
     async (
       _accessToken: string,
@@ -35,10 +34,11 @@ passport.use(
       done: VerifiedCallback
     ) => {
       try {
-        if (!profile || !profile.id) {
-          throw new Error(
-            "Profile is undefined or missing required properties"
-          );
+        console.log("Profile:", profile);
+
+        if (!profile) {
+          console.error("Google Profile is undefined");
+          return done(new Error("Google Profile is undefined"));
         }
         let user = await User.findOne({ googleId: profile.id });
 

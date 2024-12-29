@@ -71,6 +71,7 @@ export const loginUser = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
+        domain: ".onrender.com",
         path: "/",
         maxAge: 1 * 24 * 60 * 60 * 1000,
       })
@@ -94,6 +95,7 @@ export const logout = (req: Request, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
+      domain: ".onrender.com",
     });
 
     res.status(200).json({ message: "LogOutできました。" });

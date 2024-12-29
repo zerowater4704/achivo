@@ -9,15 +9,9 @@ import User from "../models/User";
 import dotenv from "dotenv";
 import generateRandomPassword from "../utils/generateRandomPassword";
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
+import { Profile } from "passport-google-oauth";
 
 dotenv.config();
-
-interface GoogleProfile {
-  id: string;
-  displayName: string;
-  emails?: Array<{ value: string }>;
-  photos?: Array<{ value: string }>;
-}
 
 passport.use(
   new GoogleStrategy(
@@ -32,7 +26,7 @@ passport.use(
     async (
       _accessToken: string,
       _refreshToken: string | undefined,
-      profile: GoogleProfile,
+      profile: Profile,
       done: VerifiedCallback
     ) => {
       try {

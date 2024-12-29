@@ -54,7 +54,7 @@ passport.use(
         done(null, { ...userObject, accessToken, refreshToken });
       } catch (err) {
         console.error("Error in GoogleStrategy:", err);
-        done(new Error());
+        done(err);
       }
     }
   )

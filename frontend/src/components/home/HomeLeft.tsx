@@ -3,7 +3,7 @@ import Login from "../../page/Login";
 import Signup from "../../page/SignUp";
 import { useAppDispatch } from "../../hooks/hooks";
 import { resetError } from "../../store/features/user/userSlice";
-import { FaGooglePlusG } from "react-icons/fa6";
+// import { FaGooglePlusG } from "react-icons/fa6";
 
 const HomeLeft: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -32,18 +32,18 @@ const HomeLeft: React.FC = () => {
     setIsLogin(false);
   };
 
-  const handleLogin = () => {
-    const googleAuthUrl = import.meta.env.VITE_GOOGLE_AUTH_URL;
-    const params = new URLSearchParams({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      redirect_uri: import.meta.env.VITE_GOOGLE_CALLBACK,
-      response_type: "code",
-      scope: "email profile", // 必須スコープを追加
-      access_type: "offline", // 必要に応じて追加
-    });
+  // const handleLogin = () => {
+  //   const googleAuthUrl = import.meta.env.VITE_GOOGLE_AUTH_URL;
+  //   const params = new URLSearchParams({
+  //     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  //     redirect_uri: import.meta.env.VITE_GOOGLE_CALLBACK,
+  //     response_type: "code",
+  //     scope: "email profile", // 必須スコープを追加
+  //     access_type: "offline", // 必要に応じて追加
+  //   });
 
-    window.location.href = `${googleAuthUrl}?${params.toString()}`;
-  };
+  //   window.location.href = `${googleAuthUrl}?${params.toString()}`;
+  // };
 
   return (
     <section className=" flex flex-col mx-5">
@@ -72,7 +72,7 @@ const HomeLeft: React.FC = () => {
       <section className="w-full sm:w-[400px] md:w-[300px] mx-auto">
         {isLogin ? (
           <>
-            <div className="border-double border-b-2 border-yellow-500 mb-6 pb-6">
+            {/* <div className="border-double border-b-2 border-yellow-500 mb-6 pb-6">
               <button
                 onClick={handleLogin}
                 className="bg-amber-800 text-white w-full py-2 rounded-md flex justify-center items-center font-bold"
@@ -82,7 +82,7 @@ const HomeLeft: React.FC = () => {
                 </span>
                 Google Login
               </button>
-            </div>
+            </div> */}
             <Login />
           </>
         ) : (

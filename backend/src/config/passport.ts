@@ -18,9 +18,6 @@ passport.use(
       clientID: process.env.CLIENTID!,
       clientSecret: process.env.CLIENTSECRET!,
       callbackURL: process.env.GOOGLE_CALLBACK,
-      passReqToCallback: true,
-      scope: ["profile", "email"],
-      access_type: "offline",
     },
     async (
       _accessToken: string,

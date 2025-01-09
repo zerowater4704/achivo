@@ -17,6 +17,11 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
     callbackURL: process.env.GOOGLE_CALLBACK,
 }, async (_accessToken, _refreshToken, profile, done) => {
     try {
+        console.log("Profile:", profile);
+        if (!profile) {
+            console.error("Google Profile is undefined");
+            return done(new Error("Google Profile is undefined"));
+        }
         let user = await User_1.default.findOne({ googleId: profile.id });
         if (!user) {
             user = new User_1.default({
@@ -35,7 +40,7 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
     }
     catch (err) {
         console.error("Error in GoogleStrategy:", err);
-        done(new Error());
+        done(err);
     }
 }));
 passport_1.default.use(new passport_jwt_1.Strategy({

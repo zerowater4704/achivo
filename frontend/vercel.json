@@ -4,6 +4,10 @@
       "source": "/api/:path*",
       "destination": "https://achivo.onrender.com/api/:path*"
     },
+    {
+      "source": "/auth/:path*",
+      "destination": "https://achivo.onrender.com/auth/:path*"
+    },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
